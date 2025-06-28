@@ -1,5 +1,4 @@
 import express from 'express';
-import axios from 'axios';
 import { decryptMedia } from '@open-wa/wa-decrypt';
 
 const app = express();
@@ -10,18 +9,14 @@ const PORT = process.env.PORT || 3000;
 
 app.post('/decrypt-audio', async (req, res) => {
   try {
-    const { url, mediaKey } = req.body;
+    const { message } = req.body;
 
-    if (!url || !mediaKey) {
-      return res.status(400).json({ error: 'URL and mediaKey are required' });
+    if (!message || !message.mediaKey || !message.url) {
+      return res.status(400).json({ error: 'Message with url and mediaKey is required' });
     }
 
-    // Faz o download do arquivo .enc
-    const response = await axios.get(url, { responseType: 'arraybuffer' });
-    const encryptedBuffer = Buffer.from(response.data);
-
-    // Descriptografa o buffer usando o mediaKey
-    const decrypted = await decryptMedia(encryptedBuffer, mediaKey);
+    // Descriptografa o áudio usando o objeto completo da mensagem e a mediaKey
+    const decrypted = await decryptMedia(message, message.mediaKey);
 
     // Converte o buffer descriptografado para base64
     const base64Audio = decrypted.toString('base64');
