@@ -30,7 +30,11 @@ app.post('/decrypt-audio', async (req, res) => {
     res.json({ base64: base64Audio });
   } catch (error) {
     console.error('Error decrypting audio:', error);
-    res.status(500).json({ error: 'Failed to decrypt audio' });
+    res.status(500).json({
+      error: 'Failed to decrypt audio',
+      details: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : null,
+    });
   }
 });
 
