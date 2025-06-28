@@ -5,7 +5,7 @@ import { decryptMedia } from '@open-wa/wa-decrypt';
 const app = express();
 app.use(express.json());
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.post('/decrypt-audio', async (req, res) => {
   try {
@@ -15,19 +15,16 @@ app.post('/decrypt-audio', async (req, res) => {
       return res.status(400).json({ error: 'URL and mediaKey are required' });
     }
 
-    // Baixa o arquivo .enc como buffer
     const response = await axios.get(url, { responseType: 'arraybuffer' });
-    const encBuffer = Buffer.from(response.data);
+    const encryptedBuffer = Buffer.from(response.data);
 
-    // Descriptografa o buffer usando mediaKey
-    const decrypted = await decryptMedia(encBuffer, mediaKey);
+    const decrypted = await decryptMedia(encryptedBuffer, mediaKey);
 
-    // Converte para base64
     const base64Audio = decrypted.toString('base64');
 
     res.json({ base64: base64Audio });
   } catch (error) {
-    console.error('Erro ao descriptografar áudio:', error);
+    console.error('Error decrypting audio:', error);
     res.status(500).json({ error: 'Failed to decrypt audio' });
   }
 });
