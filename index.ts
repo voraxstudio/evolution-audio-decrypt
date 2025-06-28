@@ -1,4 +1,13 @@
-app.post('/decrypt-audio', async (req, res) => {
+import express, { Request, Response } from 'express';
+import axios from 'axios';
+import { decryptMedia } from '@open-wa/wa-decrypt';
+
+const app = express();
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+
+app.post('/decrypt-audio', async (req: Request, res: Response) => {
   try {
     const { url, mediaKey } = req.body;
 
@@ -22,4 +31,8 @@ app.post('/decrypt-audio', async (req, res) => {
       stack: error instanceof Error ? error.stack : null,
     });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
